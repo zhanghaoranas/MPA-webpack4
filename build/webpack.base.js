@@ -12,7 +12,7 @@ const {
  * @param {string} basePath 
  */
 function getFileDir(basePath) {
-    const fileDir = glob.sync(basePath + '**/*.js');
+    const fileDir = glob.sync(basePath + '**/*.*s');
     if (fileDir.length == 0) {
         throw Error(basePath + '路径下没有js文件,请检查');
     }

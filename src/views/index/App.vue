@@ -1,6 +1,6 @@
 <template></template>
 
-<script lang>
+<script lang="ts">
 export default {};
 </script>
 
