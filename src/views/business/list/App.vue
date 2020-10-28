@@ -1,9 +1,11 @@
 <template>
 	<div>business/list</div>
 	<span>{{ testObj.name }}</span>
+	<van-button type="primary">主要按钮</van-button>
 </template>
 
 <script lang="ts">
+import { Button } from "vant";
 import { defineComponent, reactive } from "vue";
 
 export default defineComponent({
@@ -19,5 +21,8 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style lang="sass" scoped>
+	div{
+width: 200px;
+	}
 </style>
