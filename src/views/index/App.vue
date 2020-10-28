@@ -1,8 +1,6 @@
-<template>
-	<div>asdfsdfaaaaaaaaaaaaaa</div>
-</template>
+<template></template>
 
-<script>
+<script lang>
 export default {};
 </script>
 

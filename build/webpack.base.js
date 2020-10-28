@@ -2,7 +2,9 @@ const path = require('path');
 const glob = require('glob');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
-const { VueLoaderPlugin } = require('vue-loader');
+const {
+    VueLoaderPlugin
+} = require('vue-loader');
 
 /**
  * 
@@ -10,12 +12,12 @@ const { VueLoaderPlugin } = require('vue-loader');
  * @param {string} basePath 
  */
 function getFileDir(basePath) {
-    const fileDir = glob.sync(basePath +'**/*.js');
+    const fileDir = glob.sync(basePath + '**/*.js');
     if (fileDir.length == 0) {
         throw Error(basePath + '路径下没有js文件,请检查');
     }
     return fileDir;
-}  
+}
 /**
  * 
  * @param {*} basePath 
@@ -24,7 +26,7 @@ function getFileDir(basePath) {
  */
 function getDirMap(basePath, entryFileDir) {
     const dirMap = {};
-    entryFileDir.forEach((item,index) => {
+    entryFileDir.forEach((item, index) => {
         const dir = item.replace(basePath, '').split('/');
         dir.pop();
         dirMap[dir.join('/')] = getPath('.' + item);
@@ -52,14 +54,12 @@ function getHTMLTemplate(i) {
  */
 function createHtmLWebpackPlugin(dirFragment) {
     return dirFragment.map(i => (
-        new HtmlWebpackPlugin(
-            {
+        new HtmlWebpackPlugin({
             filename: `${i}.html`,
             template: getHTMLTemplate(i),
             inject: true,
             chunks: [i],
-        }
-        )    
+        })
     ));
 }
 
@@ -69,7 +69,7 @@ function getPath(pathStr) {
 
 
 // 基础路径
-const basePath = './src/views/'; 
+const basePath = './src/views/';
 const entryFileDir = getFileDir(basePath);
 const dirMap = getDirMap(basePath, entryFileDir);
 const dirFragment = Object.keys(dirMap);
@@ -82,10 +82,16 @@ const webpackBaseConf = {
         path: getPath('../dist'),
     },
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.vue$/,
                 loader: 'vue-loader'
+            },
+            {
+                test: /\.ts$/,
+                loader: 'ts-loader',
+                options: {
+                    appendTsSuffixTo: [/\.vue$/]
+                }
             },
             {
                 test: /\.js$/,
@@ -107,7 +113,7 @@ const webpackBaseConf = {
         new VueLoaderPlugin(),
         ...createHtmLWebpackPlugin(dirFragment),
         new AddAssetHtmlPlugin({
-            filepath:require.resolve('normalize.css'),
+            filepath: require.resolve('normalize.css'),
             outputPath: 'css/',
             publicPath: '/css',
             typeOfAsset: 'css',

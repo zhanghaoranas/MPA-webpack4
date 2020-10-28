@@ -15,10 +15,13 @@ module.exports = merge(common, {
     },
     module: {
         rules: [{
-            test: /\.(sa|sc|c)ss$/,
+            test: /\.(sa|sc|c)ss$/, 
+            exclude: /node_modules/,
             use: [
+                'vue-style-loader',
                 'style-loader',
                 'css-loader',
+                'postcss-loader',
                 {
                     loader:'sass-loader',
                     options:{
@@ -27,8 +30,5 @@ module.exports = merge(common, {
                 }
             ]
         }, ]
-    },
-    plugins: [
-        new webpack.HotModuleReplacementPlugin()
-    ]
+    }
 })
