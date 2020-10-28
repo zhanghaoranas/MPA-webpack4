@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const fs = require('fs');
+
 function getPath(pathStr) {
     return path.resolve(__dirname, pathStr);
 }
@@ -28,15 +29,26 @@ module.exports = merge(common, {
                     loader: 'postcss-loader'
                 },
                 {
-                    loader:'sass-loader',
-                    options:{
+                    loader: 'sass-loader',
+                    options: {
                         data: fs.readFileSync(path.join(__dirname, '../src/assets/common/common.scss'))
                     }
                 },
             ]
+        }, {
+            test: /\.less$/,
+            use: [{
+                    loader: MiniCssExtractPlugin.loader,
+                    options: {
+                        publicPath: '../', // 更改url()中的路径
+                    }
+                },
+                'css-loader',
+                'less-loader'
+            ]
         }]
     },
-    plugins:[
+    plugins: [
         new BundleAnalyzerPlugin(),
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({

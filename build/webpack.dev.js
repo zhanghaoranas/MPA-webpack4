@@ -15,20 +15,26 @@ module.exports = merge(common, {
     },
     module: {
         rules: [{
-            test: /\.(sa|sc|c)ss$/, 
-            exclude: /node_modules/,
+            test: /\.(sa|sc|c)ss$/,
+            // exclude: /node_modules/,
             use: [
                 'vue-style-loader',
-                'style-loader',
                 'css-loader',
                 'postcss-loader',
                 {
-                    loader:'sass-loader',
-                    options:{
+                    loader: 'sass-loader',
+                    options: {
                         data: fs.readFileSync(path.join(__dirname, '../src/assets/common/common.scss'))
                     }
                 }
             ]
-        }, ]
+        }, {
+            test: /\.less$/,
+            use: [
+                'vue-style-loader',
+                'css-loader',
+                'less-loader'
+            ]
+        }]
     }
 })

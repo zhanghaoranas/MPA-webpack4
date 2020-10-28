@@ -2,6 +2,7 @@ const path = require('path');
 const glob = require('glob');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+const tsImportPluginFactory = require('ts-import-plugin')
 const {
     VueLoaderPlugin
 } = require('vue-loader');
@@ -88,9 +89,20 @@ const webpackBaseConf = {
             },
             {
                 test: /\.ts$/,
+                exclude: /node_modules/,
                 loader: 'ts-loader',
                 options: {
-                    appendTsSuffixTo: [/\.vue$/]
+                    appendTsSuffixTo: [/\.vue$/],
+                    getCustomTransformers: () => ({
+                        before: [
+                            tsImportPluginFactory({
+                                libraryName: 'vant',
+                                libraryDirectory: 'es',
+                                // 这句必须加上，不然修改主题没有效果
+                                style: name => `${name}/style/less`
+                            })
+                        ]
+                    }),
                 }
             },
             {
