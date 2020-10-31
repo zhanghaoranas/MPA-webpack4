@@ -36,5 +36,8 @@ module.exports = merge(common, {
                 'less-loader'
             ]
         }]
-    }
+    },
+    plugins: [
+        new webpack.HotModuleReplacementPlugin()
+    ],
 })
