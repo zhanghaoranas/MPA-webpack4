@@ -74,72 +74,75 @@ const dirMap = getDirMap(basePath, entryFileDir);
 const dirFragment = Object.keys(dirMap);
 
 // webpack 基础配置
-const webpackBaseConf = {
-	entry: dirMap,
-	output: {
-		filename: 'js/[name].js',
-		path: getPath('../dist'),
-	},
-	module: {
-		rules: [
-			{
-				test: /\.vue$/,
-				loader: 'vue-loader',
-			},
-			{
-				test: /\.ts$/,
-				exclude: /node_modules/,
-				loader: 'ts-loader',
-				options: {
-					appendTsSuffixTo: [/\.vue$/],
-					getCustomTransformers: () => ({
-						before: [
-							tsImportPluginFactory({
-								libraryName: 'vant',
-								libraryDirectory: 'es',
-								// 这句必须加上，不然修改主题没有效果
-								style: (name) => `${name}/style/less`,
-							}),
-						],
-					}),
+const webpackBaseConf = (env) => {
+	console.log(env);
+	return {
+		entry: dirMap,
+		output: {
+			filename: 'js/[name].js',
+			path: getPath('../dist'),
+		},
+		module: {
+			rules: [
+				{
+					test: /\.vue$/,
+					loader: 'vue-loader',
 				},
-			},
-			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				loader: 'babel-loader',
-			},
-			{
-				test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
-				use: {
-					loader: 'url-loader',
+				{
+					test: /\.ts$/,
+					exclude: /node_modules/,
+					loader: 'ts-loader',
 					options: {
-						limit: '8197',
+						appendTsSuffixTo: [/\.vue$/],
+						getCustomTransformers: () => ({
+							before: [
+								tsImportPluginFactory({
+									libraryName: 'vant',
+									libraryDirectory: 'es',
+									// 这句必须加上，不然修改主题没有效果
+									style: (name) => `${name}/style/less`,
+								}),
+							],
+						}),
 					},
 				},
-			},
-		],
-	},
-	plugins: [
-		new VueLoaderPlugin(),
-		...createHtmLWebpackPlugin(dirFragment),
-		new AddAssetHtmlPlugin({
-			filepath: require.resolve('normalize.css'),
-			outputPath: 'css/',
-			publicPath: '/css',
-			typeOfAsset: 'css',
-		}),
-	],
-	resolve: {
-		extensions: ['.js'],
-		alias: {
-			common: getPath('../src/assets/common'),
-			images: getPath('../src/assets/images'),
-			json: getPath('../src/assets/json'),
-			fonts: getPath('../src/assets/fonts'),
+				{
+					test: /\.js$/,
+					exclude: /node_modules/,
+					loader: 'babel-loader',
+				},
+				{
+					test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+					use: {
+						loader: 'url-loader',
+						options: {
+							limit: '8197',
+						},
+					},
+				},
+			],
 		},
-	},
-	stats: 'errors-only',
+		plugins: [
+			new VueLoaderPlugin(),
+			...createHtmLWebpackPlugin(dirFragment),
+			new AddAssetHtmlPlugin({
+				filepath: require.resolve('normalize.css'),
+				outputPath: 'css/',
+				publicPath: '/css',
+				typeOfAsset: 'css',
+			}),
+		],
+		resolve: {
+			extensions: ['.js'],
+			alias: {
+				common: getPath('../src/assets/common'),
+				images: getPath('../src/assets/images'),
+				json: getPath('../src/assets/json'),
+				fonts: getPath('../src/assets/fonts'),
+			},
+		},
+		stats: 'errors-only',
+	};
 };
 
 module.exports = webpackBaseConf;

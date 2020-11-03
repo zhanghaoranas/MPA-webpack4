@@ -15,3 +15,9 @@
 ### 思考
 
 1. 移动端与 H5 有没有更好的方法进行数据的传递？ （）
+
+### 使用
+
+本地开发: yarn run dev
+打测试包: yarn run build-local
+正式包: yarn run build-server
