@@ -132,7 +132,7 @@ const webpackBaseConf = {
         }),
     ],
     resolve: {
-        extensions: ['.js', '.scss', '.png', 'jpg'],
+        extensions: ['.js'],
         alias: {
             'common': getPath('../src/assets/common'),
             'images': getPath('../src/assets/images'),
