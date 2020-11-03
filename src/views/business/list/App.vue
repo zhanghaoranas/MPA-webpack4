@@ -1,27 +1,13 @@
 <template>
 	<van-dropdown-menu :close-on-click-outside="false">
 		<van-dropdown-item v-model="value" :options="option" />
-		<van-dropdown-item title="筛选" ref="item">
+		<van-dropdown-item title="筛选">
 			<van-cell-group>
-				<van-field v-model="search.keyword" label="模糊检索" placeholder="请输入用户名" />
-				<van-field v-model="search.time" readonly label="模糊检索" placeholder="请输入用户名" />
-				<van-field v-model="search.time" readonly label="模糊检索" placeholder="请输入用户名" />
-				<van-field
-					v-model="search.time"
-					readonly
-					label="模糊检索"
-					placeholder="请输入用户名"
-					@click="datetimeShow = true"
-				/>
-				<van-field v-model="search.time" readonly label="模糊检索" placeholder="请输入用户名" />
-				<van-checkbox-group v-model="result">
-					<van-checkbox name="a">复选框 a</van-checkbox>
-					<van-checkbox name="b">复选框 b</van-checkbox>
-				</van-checkbox-group>
-				<van-checkbox-group v-model="result">
-					<van-checkbox name="a">复选框 a</van-checkbox>
-					<van-checkbox name="b">复选框 b</van-checkbox>
-				</van-checkbox-group>
+				<van-field v-model="search.keyword" label="模糊检索" placeholder="请输入客户名/主联系人/手机号" />
+				<van-field v-model="search.time" readonly label="地址类型" placeholder="请输入用户名" />
+				<van-field v-model="search.time" readonly label="区域选择" placeholder="请输入用户名" />
+				<van-field v-model="search.time" readonly label="接触开始" placeholder="请输入用户名" @click="datetimeShow = true" />
+				<van-field v-model="search.time" readonly label="接触结束" placeholder="请输入用户名" />
 			</van-cell-group>
 			<div class="search_btn">
 				<van-button type="danger" size="small" @click="handleClickReset">重置</van-button>
@@ -29,16 +15,9 @@
 			</div>
 		</van-dropdown-item>
 	</van-dropdown-menu>
-	<van-popup
-		class="aa"
-		v-model:show="datetimeShow"
-		position="bottom"
-		:style="{height: '308px'}"
-		@click.stop="handleClick"
-	>
+	<van-popup v-model:show="datetimeShow" position="bottom" :style="{height: '308px'}" @click.stop="handleClick">
 		<van-datetime-picker v-model="time" type="datetime" title="选择完整时间" />
 	</van-popup>
-	<div @click="test">test click</div>
 </template>
 
 <script lang="ts">
