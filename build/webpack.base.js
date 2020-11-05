@@ -1,8 +1,10 @@
 const path = require('path');
 const glob = require('glob');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+// const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const tsImportPluginFactory = require('ts-import-plugin');
+const TerserPlugin = require('terser-webpack-plugin'); // 在webpack5中内置，不需要再安装
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin'); // 加快构建速度
 const {VueLoaderPlugin} = require('vue-loader');
 
 /**
@@ -74,75 +76,82 @@ const dirMap = getDirMap(basePath, entryFileDir);
 const dirFragment = Object.keys(dirMap);
 
 // webpack 基础配置
-const webpackBaseConf = (env) => {
-	console.log(env);
-	return {
-		entry: dirMap,
-		output: {
-			filename: 'js/[name].js',
-			path: getPath('../dist'),
-		},
-		module: {
-			rules: [
-				{
-					test: /\.vue$/,
-					loader: 'vue-loader',
-				},
-				{
-					test: /\.ts$/,
-					exclude: /node_modules/,
-					loader: 'ts-loader',
-					options: {
-						appendTsSuffixTo: [/\.vue$/],
-						getCustomTransformers: () => ({
-							before: [
-								tsImportPluginFactory({
-									libraryName: 'vant',
-									libraryDirectory: 'es',
-									// 这句必须加上，不然修改主题没有效果
-									style: (name) => `${name}/style/less`,
-								}),
-							],
-						}),
-					},
-				},
-				{
-					test: /\.js$/,
-					exclude: /node_modules/,
-					loader: 'babel-loader',
-				},
-				{
-					test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
-					use: {
-						loader: 'url-loader',
-						options: {
-							limit: '8197',
-						},
-					},
-				},
-			],
-		},
-		plugins: [
-			new VueLoaderPlugin(),
-			...createHtmLWebpackPlugin(dirFragment),
-			new AddAssetHtmlPlugin({
-				filepath: require.resolve('normalize.css'),
-				outputPath: 'css/',
-				publicPath: '/css',
-				typeOfAsset: 'css',
-			}),
-		],
-		resolve: {
-			extensions: ['.js'],
-			alias: {
-				common: getPath('../src/assets/common'),
-				images: getPath('../src/assets/images'),
-				json: getPath('../src/assets/json'),
-				fonts: getPath('../src/assets/fonts'),
+const webpackBaseConf = {
+	entry: dirMap,
+	output: {
+		filename: 'js/[name].js',
+		path: getPath('../dist'),
+	},
+	module: {
+		rules: [
+			{
+				test: /\.vue$/,
+				loader: 'vue-loader',
 			},
+			{
+				test: /\.ts$/,
+				exclude: /node_modules/,
+				loader: 'ts-loader',
+				options: {
+					appendTsSuffixTo: [/\.vue$/],
+					getCustomTransformers: () => ({
+						before: [
+							tsImportPluginFactory({
+								libraryName: 'vant',
+								libraryDirectory: 'es',
+								// 这句必须加上，不然修改主题没有效果
+								style: (name) => `${name}/style/less`,
+							}),
+						],
+					}),
+				},
+			},
+			{
+				test: /\.js$/,
+				exclude: /node_modules/,
+				use: {
+					loader: 'babel-loader',
+					options: {
+						cacheDirectory: true,
+					},
+				},
+			},
+			{
+				test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+				use: {
+					loader: 'url-loader',
+					options: {
+						limit: '8197',
+					},
+				},
+			},
+		],
+	},
+	plugins: [
+		new VueLoaderPlugin(),
+		...createHtmLWebpackPlugin(dirFragment),
+		// 这插件不更新 可能会替换掉 先注释
+		// new AddAssetHtmlPlugin({
+		// 	filepath: require.resolve('normalize.css'),
+		// 	outputPath: 'css/',
+		// 	publicPath: '/css',
+		// 	typeOfAsset: 'css',
+		// }),
+		new HardSourceWebpackPlugin(),
+	],
+	resolve: {
+		alias: {
+			common: getPath('../src/assets/common'),
+			images: getPath('../src/assets/images'),
+			json: getPath('../src/assets/json'),
+			fonts: getPath('../src/assets/fonts'),
 		},
-		stats: 'errors-only',
-	};
+	},
+	stats: 'errors-only',
+	optimization: {
+		minimize: true,
+		minimizer: [new TerserPlugin()],
+	},
 };
 
 module.exports = webpackBaseConf;
