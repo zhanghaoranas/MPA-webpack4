@@ -3,13 +3,10 @@ const webpack = require('webpack');
 const common = require('./webpack.base.js');
 const path = require('path');
 const fs = require('fs');
-const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 
-const smp = new SpeedMeasurePlugin();
 // 由于设置了环境变量所以 导出的是一个函数而不是一个对象。
 
-module.exports = smp.wrap((env) => {
-	console.log(env);
+module.exports = (env) => {
 	return merge(common, {
 		devtool: 'inline-source-map',
 		mode: 'development',
@@ -19,6 +16,9 @@ module.exports = smp.wrap((env) => {
 			open: true,
 			disableHostCheck: true,
 			hot: true,
+			historyApiFallback: {
+				rewrites: [{from: /^\/$/, to: '/business/list.html'}], // 进行重定向
+			},
 		},
 		module: {
 			rules: [
@@ -45,4 +45,4 @@ module.exports = smp.wrap((env) => {
 		},
 		plugins: [new webpack.HotModuleReplacementPlugin()],
 	});
-});
+};

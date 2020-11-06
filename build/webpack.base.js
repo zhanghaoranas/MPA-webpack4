@@ -4,20 +4,51 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 // const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const tsImportPluginFactory = require('ts-import-plugin');
 const TerserPlugin = require('terser-webpack-plugin'); // 在webpack5中内置，不需要再安装
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin'); // 加快构建速度
+
 const {VueLoaderPlugin} = require('vue-loader');
 
 /**
  *
- * @description basePath 下所有的js文件的路径
+ * @description basePath下js/ts文件的路径， 如果存在name 则获取文件名为name的文件
  * @param {string} basePath
+ * @param {string} name
+ * @param {'js' | 'ts'} ext 当有重复name时使用那个作为入口文件
  */
-function getFileDir(basePath) {
-	const fileDir = glob.sync(basePath + '**/*.*s');
+function getFileDir(basePath, name, ext = 'js') {
+	const fileName = name ? `{name}.*s` : '*.*s';
+	const fileDir = glob.sync(basePath + '**/' + fileName);
 	if (fileDir.length == 0) {
 		throw Error(basePath + '路径下没有js文件,请检查');
 	}
-	return fileDir;
+	// 检测是否有name 相同但后缀名不同的文件 如 a.js 和 a.ts
+	const fileDirObj = {};
+	console.log(fileDir);
+	const fileDirNoEXT = fileDir.map((item) => {
+		return item.replace(/\.(j|t)s$/, '');
+	});
+	console.log(fileDirNoEXT);
+	fileDirNoEXT.forEach((item) => {
+		if (fileDirObj[item]) {
+			fileDirObj[item] = fileDirObj[item] + 1;
+		} else {
+			fileDirObj[item] = 1;
+		}
+	});
+	const repeatDir = [];
+
+	for (let [key, value] of Object.entries(fileDirObj)) {
+		if (value > 1) {
+			repeatDir.push(key + '.' + ext);
+		}
+	}
+	console.log(repeatDir);
+	if (repeatDir.length > 0) {
+		return fileDir.filter((item) => {
+			!repeatDir.includes(item);
+		});
+	} else {
+		return fileDir;
+	}
 }
 /**
  *
@@ -60,7 +91,7 @@ function createHtmLWebpackPlugin(dirFragment) {
 				filename: `${i}.html`,
 				template: getHTMLTemplate(i),
 				inject: true,
-				chunks: [i],
+				chunks: [i, 'venders'],
 			})
 	);
 }
@@ -69,9 +100,10 @@ function getPath(pathStr) {
 	return path.resolve(__dirname, pathStr);
 }
 
-// 基础路径
-const basePath = './src/views/';
+// 基础路径 通过更改basePath 可以进行部分模块编译， 优化编译速度
+let basePath = './src/views/';
 const entryFileDir = getFileDir(basePath);
+console.log(entryFileDir);
 const dirMap = getDirMap(basePath, entryFileDir);
 const dirFragment = Object.keys(dirMap);
 
@@ -90,7 +122,7 @@ const webpackBaseConf = {
 			},
 			{
 				test: /\.ts$/,
-				exclude: /node_modules/,
+				include: getPath('../src'),
 				loader: 'ts-loader',
 				options: {
 					appendTsSuffixTo: [/\.vue$/],
@@ -108,7 +140,7 @@ const webpackBaseConf = {
 			},
 			{
 				test: /\.js$/,
-				exclude: /node_modules/,
+				include: getPath('../src'),
 				use: {
 					loader: 'babel-loader',
 					options: {
@@ -118,6 +150,7 @@ const webpackBaseConf = {
 			},
 			{
 				test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+				include: getPath('../src'),
 				use: {
 					loader: 'url-loader',
 					options: {
@@ -137,7 +170,6 @@ const webpackBaseConf = {
 		// 	publicPath: '/css',
 		// 	typeOfAsset: 'css',
 		// }),
-		new HardSourceWebpackPlugin(),
 	],
 	resolve: {
 		alias: {
@@ -150,7 +182,15 @@ const webpackBaseConf = {
 	stats: 'errors-only',
 	optimization: {
 		minimize: true,
-		minimizer: [new TerserPlugin()],
+		minimizer: [
+			new TerserPlugin({
+				cache: true,
+			}),
+		],
+		splitChunks: {
+			name: 'venders',
+			chunks: 'all',
+		},
 	},
 };
 

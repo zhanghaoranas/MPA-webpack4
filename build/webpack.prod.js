@@ -6,6 +6,7 @@ const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const fs = require('fs');
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin'); // 加快构建速度
 
 const smp = new SpeedMeasurePlugin();
 function getPath(pathStr) {
@@ -66,6 +67,7 @@ module.exports = smp.wrap((env) => {
 				chunkFilename: '[name].css',
 				publicPath: '../assets/',
 			}),
+			new HardSourceWebpackPlugin(),
 		],
 	});
 });
