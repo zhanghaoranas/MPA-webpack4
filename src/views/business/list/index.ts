@@ -1,7 +1,6 @@
-import {createApp} from 'vue';
+import { createApp } from 'vue';
 import App from './App.vue';
-import {Button, DropdownMenu, DropdownItem, Cell, CellGroup, Field, DatetimePicker, Popup, Checkbox, CheckboxGroup} from 'vant';
-import {fetchGet} from '../../../utils/fetch';
+import { Button, DropdownMenu, DropdownItem, Cell, CellGroup, Field, DatetimePicker, Popup, Checkbox, CheckboxGroup } from 'vant';
 
 createApp(App)
 	.use(Button)

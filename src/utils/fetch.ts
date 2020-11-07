@@ -1,9 +1,9 @@
-import axios, {AxiosRequestConfig, Method} from 'axios';
+import axios, { AxiosRequestConfig, Method } from 'axios';
 import * as qs from 'qs';
-import {baseUrl} from '../config/index';
-import {getToken} from '../utils/index';
+import { baseUrl } from '../config/index';
+import { getToken } from '../utils/index';
 
-type CustomConfig = Omit<AxiosRequestConfig, 'url' | 'method'>;
+type CustomRequestConfig = Omit<AxiosRequestConfig, 'url' | 'method'>;
 
 // 生成axios 实例 保证axios的纯洁
 const axiosInstance = axios.create({
@@ -39,7 +39,7 @@ axiosInstance.interceptors.response.use(
  * config 中如果存在 url 或 method 则覆盖预设的 url和methods , 需要优化。
  * @param type
  */
-const createAxios = (type: Method) => (url: string, data = {}, config: CustomConfig = {}) => {
+const createAxios = (type: Method) => (url: string) => (data = {}, config: CustomRequestConfig = {}) => {
 	const baseConfig: AxiosRequestConfig = {
 		url,
 		method: type,
@@ -72,4 +72,4 @@ const fetch = (config: AxiosRequestConfig) => {
 	return axiosInstance(config);
 };
 
-export {fetchGet, fetchPost, fetch};
+export { fetchGet, fetchPost, fetch, CustomRequestConfig };

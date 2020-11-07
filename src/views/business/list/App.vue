@@ -22,10 +22,14 @@
 
 <script lang="ts">
 import {defineComponent, reactive, ref, computed, readonly} from 'vue';
+import {getQueryStringForUrl} from '../../../utils'
+import {getBusinessList} from '../../../api'
+
 
 export default defineComponent({
 	name: 'business-list',
 	setup(props, context) {
+		const queryString = readonly(getQueryStringForUrl());
 		const value = ref(0);
 		const datetimeShow = ref(false);
 		const option = readonly([
@@ -46,6 +50,10 @@ export default defineComponent({
 			time: '',
 		});
 		const time = reactive(new Date());
+		const businessList = reactive({});
+		const getList = async () => {
+			const businessList = await getBusinessList(search);
+		} 
 		return {
 			search,
 			value,
@@ -54,6 +62,8 @@ export default defineComponent({
 			datetimeShow,
 			time,
 			result,
+			getList,
+			businessList
 		};
 	},
 	methods: {
