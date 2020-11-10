@@ -14,7 +14,7 @@
 		"normalize.css": "^8.0.1",
 		"qs": "^6.9.4",
 		"query-string": "^6.13.6",
-		"vant": "^3.0.0-beta.6",
+		"vant": "^3.0.0-beta.7",
 		"vue": "^3.0.2"
 	},
 	"devDependencies": {

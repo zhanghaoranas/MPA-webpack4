@@ -5,7 +5,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const tsImportPluginFactory = require('ts-import-plugin');
 const TerserPlugin = require('terser-webpack-plugin'); // 在webpack5中内置，不需要再安装
 
-const {VueLoaderPlugin} = require('vue-loader');
+const {
+	VueLoaderPlugin
+} = require('vue-loader');
 
 /**
  *
@@ -87,12 +89,12 @@ function getHTMLTemplate(i) {
 function createHtmLWebpackPlugin(dirFragment) {
 	return dirFragment.map(
 		(i) =>
-			new HtmlWebpackPlugin({
-				filename: `${i}.html`,
-				template: getHTMLTemplate(i),
-				inject: true,
-				chunks: [i, 'venders'],
-			})
+		new HtmlWebpackPlugin({
+			filename: `${i}.html`,
+			template: getHTMLTemplate(i),
+			inject: true,
+			chunks: [i, 'venders'],
+		})
 	);
 }
 
@@ -115,8 +117,7 @@ const webpackBaseConf = {
 		path: getPath('../dist'),
 	},
 	module: {
-		rules: [
-			{
+		rules: [{
 				test: /\.vue$/,
 				loader: 'vue-loader',
 			},
@@ -172,7 +173,9 @@ const webpackBaseConf = {
 		// }),
 	],
 	resolve: {
+		extensions: ['.ts', '.js', '.json'],
 		alias: {
+			'@': getPath('../src'),
 			common: getPath('../src/assets/common'),
 			images: getPath('../src/assets/images'),
 			json: getPath('../src/assets/json'),

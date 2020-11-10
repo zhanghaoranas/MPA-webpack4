@@ -8,7 +8,7 @@ type CustomRequestConfig = Omit<AxiosRequestConfig, 'url' | 'method'>;
 // 生成axios 实例 保证axios的纯洁
 const axiosInstance = axios.create({
 	baseURL: baseUrl,
-	timeout: 30 * 1000,
+	timeout: 12 * 1000,
 });
 
 // 添加请求拦截器

@@ -3,9 +3,3 @@ declare module '*.vue' {
   const component: ReturnType<typeof defineComponent>
   export default component
 }
-
-declare global {
-  interface Window { salesApp: any; }
-}
-
-export { }

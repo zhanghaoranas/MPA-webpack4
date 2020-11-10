@@ -1,26 +1,34 @@
 import { parse, ParsedQuery } from 'query-string';
+import { env, localToken } from '../config'
 
+interface UserInfo {
+	user_role: number;
+	user_name: string | null;
+	user_id: number | null;
+	user_dept_id: number | null;
+	user_dept: string | null;
+	access_token: string | null;
+}
 
 /**
  * 得到token
  */
 function getToken(): string | null {
-	const token = sessionStorage.getItem('token');
-	if (token) {
-		return token;
+	if (env === 2) {
+		return localToken
 	} else {
-		throw Error('dont get Token please check');
+		const token = sessionStorage.getItem('token');
+		if (token) {
+			return token;
+		} else {
+			throw Error('dont get Token please check');
+		}
 	}
+
 }
 
 /**
- * 环境 分为正式环境 0， 安卓测试环境 1， ios 开发环境2， web开发3.
- * 此处的正式环境不是 yarn build 时的环境
- */
-function getENV() { }
-
-/**
- * 获取用户当前的设备（当前只判断了iPhone 为）
+ * 获取用户当前的设备（当前只判断了iPhone没有判断iPad）
  */
 function getUserAgent() {
 	const userAgent = navigator.userAgent;
@@ -44,32 +52,46 @@ function isIOS(): boolean {
  * 获取当前用户的信息
  * 
  */
-function getUserInfo() {
-	if (isIOS()) {
-
+function getUserInfo(): UserInfo | undefined {
+	if (env === 2) {
+		return {
+			user_role: 4,
+			user_name: null,
+			user_id: null,
+			user_dept_id: null,
+			user_dept: null,
+			access_token: getToken(),
+		}
 	} else {
-		// 是否在真机运行
-		if (typeof salesApp === 'undefined') {
-			return JSON.parse(salesApp.getUserInfo())
+		if (isIOS()) {
+
 		} else {
-			return {
-				userRole: 4,
-				userName: null,
-				userId: null,
-				userDeptId: null,
-				userDept: null,
-				accessToken: getToken(),
+			// 是否在真机运行
+			if (typeof salesApp === 'undefined') {
+				const userInfo: UserInfo = JSON.parse(salesApp.getUserInfo())
+				sessionStorage.setItem('token', userInfo.access_token as string);
+				return userInfo;
 			}
 		}
+
 	}
 }
 
 
+
+/**
+ * 获取url中的参数
+ */
+
 const getQueryStringForUrl = (() => {
 	const parsed = parse(location.search);
-	return (keys: string | string[] | null) => {
+	// 函数的重载 （查一下匿名函数如何重载）
+	function getQuery(): ParsedQuery;
+	function getQuery(keys: string): string; // undifind 为 string 的子类型
+	function getQuery(keys: string[]): ParsedQuery;
+	function getQuery(keys?: string | string[]): string | ParsedQuery {
 		if (typeof keys === 'string') {
-			return parsed[keys] as string | null;
+			return parsed[keys] as string;
 		} else if (Array.isArray(keys)) {
 			const queryString: ParsedQuery = {};
 			keys.forEach(key => {
@@ -80,5 +102,9 @@ const getQueryStringForUrl = (() => {
 			return parsed;
 		}
 	}
+	return getQuery
 })();
-export { getToken, getENV, isIPhone, getUserInfo, getQueryStringForUrl };
+
+
+
+export { getToken, isIOS, getUserInfo, getQueryStringForUrl, };

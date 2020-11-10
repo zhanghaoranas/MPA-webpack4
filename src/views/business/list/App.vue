@@ -1,6 +1,6 @@
 <template>
 	<van-dropdown-menu :close-on-click-outside="false">
-		<van-dropdown-item v-model="value" :options="option" />
+		<van-dropdown-item v-model="search.sort" :options="option" />
 		<van-dropdown-item title="筛选">
 			<van-cell-group>
 				<van-field v-model="search.keyword" label="模糊检索" placeholder="请输入客户名/主联系人/手机号" />
@@ -21,16 +21,15 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, ref, computed, readonly} from 'vue';
-import {getQueryStringForUrl} from '../../../utils'
+import {defineComponent, reactive, ref, computed, readonly, onMounted} from 'vue';
+import {getQueryStringForUrl, getUserInfo} from '../../../utils'
 import {getBusinessList} from '../../../api'
-
 
 export default defineComponent({
 	name: 'business-list',
 	setup(props, context) {
-		const queryString = readonly(getQueryStringForUrl());
-		const value = ref(0);
+		const queryString = getQueryStringForUrl(); // 获取url中传递的参数
+		const userInfo = getUserInfo(); // 获取 userInfo
 		const datetimeShow = ref(false);
 		const option = readonly([
 			{text: '默认', type: 1, value: 0},
@@ -48,15 +47,18 @@ export default defineComponent({
 		const search = reactive({
 			keyword: '',
 			time: '',
+			sort: 1,
 		});
 		const time = reactive(new Date());
 		const businessList = reactive({});
 		const getList = async () => {
 			const businessList = await getBusinessList(search);
 		} 
+		onMounted(()=>{
+			getList();
+		})
 		return {
 			search,
-			value,
 			option,
 			sort,
 			datetimeShow,
